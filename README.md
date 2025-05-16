@@ -71,26 +71,3 @@ Example for generating 10M+ rows:
 ```bash
 docker compose exec web python project/scripts/generate_prod_data.py postgresql://twitter_user:twitter_password@db:5432/twitter_dev 50000 200
 ```
-
-## Project Structure
-
-```
-twitter_clone/
-├── docker-compose.yml          # Development configuration
-├── docker-compose.prod.yml     # Production configuration
-├── services/
-│   ├── postgres/              # PostgreSQL service
-│   │   ├── Dockerfile
-│   │   └── schema.sql
-│   └── web/                   # Flask application
-│       ├── Dockerfile
-│       ├── Dockerfile.prod
-│       ├── manage.py
-│       ├── requirements.txt
-│       └── project/
-│           ├── __init__.py
-│           ├── auth.py
-│           ├── main.py
-│           ├── models.py
-│           └── templates/
-```
