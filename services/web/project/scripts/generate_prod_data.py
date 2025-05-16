@@ -1,8 +1,13 @@
 """Script to generate production-scale test data for the Twitter clone application."""
+import os
 import sys
 import random
 import multiprocessing
 from datetime import datetime, timedelta
+
+# Add the parent directory to the Python path
+sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
+
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from project.models import User, Tweet, URL

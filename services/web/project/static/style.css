@@ -1,0 +1,53 @@
+/* Custom styling on top of Bootstrap */
+
+body {
+    background-color: #f8f9fa;
+}
+
+.card {
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.card-title {
+    margin-bottom: 0.5rem;
+}
+
+.navbar {
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.alert {
+    margin-top: 1rem;
+}
+
+mark {
+    padding: 0.2em;
+    background-color: #fff3cd;
+    border-radius: 0.2em;
+}
+
+/* Tweet card styling */
+.card-text {
+    white-space: pre-wrap;
+    word-wrap: break-word;
+}
+
+.text-muted a {
+    color: inherit;
+    text-decoration: underline;
+}
+
+/* Form styling */
+.form-control:focus {
+    border-color: #0d6efd;
+    box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+}
+
+/* Pagination styling */
+.pagination {
+    margin-bottom: 0;
+}
+
+.page-link:focus {
+    box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+} 
