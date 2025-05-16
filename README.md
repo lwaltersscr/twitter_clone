@@ -1,53 +1,106 @@
-# Flask on Docker
+# Twitter Clone
 
-## Overview
-This repository contains a fully Dockerized Flask web application integrated with PostgreSQL, Gunicorn, and Nginx. The web service allows users to upload images, which are then served from a secure media directory. The project is structured for both development and production environments, following best practices for containerization, database management, and web server configuration.
+A Flask-based Twitter clone with PostgreSQL backend and RUM index support for efficient full-text search.
 
-## Example image ulpoad
+## Features
 
-![hippo](https://media0.giphy.com/media/v1.Y2lkPTc5MGI3NjExenBwa2w5aDlweTZyaXd2dng1b3ZtaDhnbXFtdXQyZG16ajk2cmRvYSZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/mhoKQ4AWWLG3c0ha3p/giphy.gif)
+- User authentication (login/signup)
+- Tweet creation and viewing
+- Full-text search with RUM index
+- URL extraction and indexing
+- Production-ready Docker setup
+- Test data generation for performance testing
 
+## Development Setup
 
-## Build Instructions
-1. Clone the repo
-2. Create the following environment files in the project root:
-     - .env.dev (Development)
-       ```
-       FLASK_APP=project/__init__.py
-       FLASK_DEBUG=1
-       DATABASE_URL=postgresql://hello_flask:hello_flask@db:5432/hello_flask_dev
-       SQL_HOST=db
-       SQL_PORT=5432
-       DATABASE=postgres
-       APP_FOLDER=/usr/src/app
-       ```
-     - .env.prod (Production)
-       ```
-       FLASK_APP=project/__init__.py
-       FLASK_DEBUG=0
-       DATABASE_URL=postgresql://hello_flask:hello_flask@db:5432/hello_flask_prod
-       SQL_HOST=db
-       SQL_PORT=5432
-       DATABASE=postgres
-       APP_FOLDER=/home/app/web
-       ```
-     - .env.prod.db (Database - Production) --  Ensure these files are in .gitignore to avoid uploading sensitive credentials.
-       ```
-       POSTGRES_USER=hello_flask
-       POSTGRES_PASSWORD=hello_flask
-       POSTGRES_DB=hello_flask_prod
-       ```
-4. Build and run in development mode: `docker-compose up -d --build`
-     - Access the app at: `http://localhost:8080`
-     - Test static files at: `http://localhost:8080/static/hello.txt`
-5. Build and run in production mode:
-     - `docker-compose -f docker-compose.prod.yml down -v`
-     - `docker-compose -f docker-compose.prod.yml up -d --build`
-     - `docker-compose -f docker-compose.prod.yml exec web python manage.py create_db`
-     - `docker-compose -f docker-compose.prod.yml up -d --build`
-     - Access the production app at: `http://localhost:8080/`
-7. Test media upload: `http://localhost:8080/upload`
-8. View the uploaded media file: `http://localhost:1033/media/IMAGE_FILE_NAME`
-9. To stop containers:
-      - `docker-compose down -v`
-      - `docker-compose -f docker-compose.prod.yml down -v`
+1. Clone the repository:
+```bash
+git clone <your-repo-url>
+cd twitter_clone
+```
+
+2. Create environment files:
+```bash
+# .env.dev
+FLASK_APP=project/__init__.py
+FLASK_DEBUG=1
+DATABASE_URL=postgresql://twitter_user:twitter_password@db:5432/twitter_dev
+```
+
+3. Build and start the development services:
+```bash
+docker-compose up -d --build
+```
+
+4. Create database tables:
+```bash
+docker-compose exec web python manage.py create_db
+```
+
+5. Generate test data (optional):
+```bash
+docker-compose exec web python project/scripts/generate_prod_data.py postgresql://twitter_user:twitter_password@db:5432/twitter_dev 100 50
+```
+
+6. Visit http://localhost:1033
+
+## Production Setup
+
+1. Create production environment file:
+```bash
+# .env.prod
+FLASK_APP=project/__init__.py
+FLASK_DEBUG=0
+DATABASE_URL=postgresql://twitter_user:twitter_password@db:5432/twitter_prod
+```
+
+2. Build and start production services:
+```bash
+docker-compose -f docker-compose.prod.yml up -d --build
+```
+
+## Test Data Generation
+
+The project includes a script to generate large amounts of test data:
+
+```bash
+docker-compose exec web python project/scripts/generate_prod_data.py <database_url> <num_users> <tweets_per_user>
+```
+
+Example for generating 10M+ rows:
+```bash
+docker-compose exec web python project/scripts/generate_prod_data.py postgresql://twitter_user:twitter_password@db:5432/twitter_dev 50000 200
+```
+
+## Project Structure
+
+```
+twitter_clone/
+├── docker-compose.yml          # Development configuration
+├── docker-compose.prod.yml     # Production configuration
+├── services/
+│   ├── postgres/              # PostgreSQL service
+│   │   ├── Dockerfile
+│   │   └── schema.sql
+│   └── web/                   # Flask application
+│       ├── Dockerfile
+│       ├── Dockerfile.prod
+│       ├── manage.py
+│       ├── requirements.txt
+│       └── project/
+│           ├── __init__.py
+│           ├── auth.py
+│           ├── main.py
+│           ├── models.py
+│           └── templates/
+```
+
+## Contributing
+
+1. Create a new branch for your feature
+2. Make your changes
+3. Submit a pull request
+
+## License
+
+MIT
