@@ -1,0 +1,32 @@
+version: '3.8'
+
+services:
+  web:
+    build: ./services/web
+    command: python manage.py run -h 0.0.0.0
+    volumes:
+      - ./services/web/:/usr/src/app/
+    ports:
+      - 1033:5000
+    env_file:
+      - ./.env.dev
+    environment:
+      - FLASK_APP=project/__init__.py
+      - FLASK_DEBUG=1
+      - DATABASE_URL=postgresql://twitter_user:twitter_password@db:5432/twitter_dev
+    depends_on:
+      - db
+
+  db:
+    build: ./services/postgres
+    volumes:
+      - postgres_data:/var/lib/postgresql/data/
+    environment:
+      - POSTGRES_USER=twitter_user
+      - POSTGRES_PASSWORD=twitter_password
+      - POSTGRES_DB=twitter_dev
+    ports:
+      - 5432:5432
+
+volumes:
+  postgres_data:

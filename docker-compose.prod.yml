@@ -1,0 +1,55 @@
+version: '3.8'
+
+services:
+  web:
+    build:
+      context: ./services/web
+      dockerfile: Dockerfile.prod
+    command: gunicorn --bind 0.0.0.0:5000 manage:app
+    volumes:
+      - static_volume:/usr/src/app/project/static
+      - media_volume:/usr/src/app/project/media
+    expose:
+      - 5000
+    env_file:
+      - ./.env.prod
+    depends_on:
+      - db
+    environment:
+      - FLASK_APP=project/__init__.py
+      - DATABASE_URL=postgresql://twitter_user:twitter_password@db:5432/twitter_prod
+
+  db:
+    build: ./services/postgres
+    volumes:
+      - postgres_data_prod:/var/lib/postgresql/data/
+    environment:
+      - POSTGRES_USER=twitter_user
+      - POSTGRES_PASSWORD=twitter_password
+      - POSTGRES_DB=twitter_prod
+    # Tune PostgreSQL for better performance
+    command: >
+      postgres
+      -c shared_buffers=256MB
+      -c effective_cache_size=768MB
+      -c maintenance_work_mem=64MB
+      -c work_mem=4MB
+      -c max_connections=100
+      -c max_worker_processes=4
+      -c max_parallel_workers_per_gather=2
+      -c max_parallel_workers=4
+
+  nginx:
+    build: ./services/nginx
+    volumes:
+      - static_volume:/usr/src/app/project/static
+      - media_volume:/usr/src/app/project/media
+    ports:
+      - 1337:80
+    depends_on:
+      - web
+
+volumes:
+  postgres_data_prod:
+  static_volume:
+  media_volume:

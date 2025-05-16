@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+
+{% block title %}Home{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-8">
+        <h1 class="h3 mb-4">Recent Tweets</h1>
+        {% for tweet in tweets.items %}
+        <div class="card mb-3">
+            <div class="card-body">
+                <h5 class="card-title">{{ tweet.author.username }}</h5>
+                <h6 class="card-subtitle mb-2 text-muted">{{ tweet.created_at.strftime('%Y-%m-%d %H:%M:%S') }}</h6>
+                <p class="card-text">{{ tweet.content }}</p>
+                {% if tweet.urls.count() > 0 %}
+                <div class="card-text">
+                    <small class="text-muted">Links:</small>
+                    <ul class="list-unstyled">
+                        {% for url in tweet.urls %}
+                        <li><a href="{{ url.url }}" target="_blank">{{ url.url }}</a></li>
+                        {% endfor %}
+                    </ul>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+        {% endfor %}
+
+        <nav aria-label="Tweet navigation">
+            <ul class="pagination">
+                {% if tweets.has_prev %}
+                <li class="page-item">
+                    <a class="page-link" href="{{ url_for('main.index', page=tweets.prev_num) }}">Previous</a>
+                </li>
+                {% endif %}
+                {% if tweets.has_next %}
+                <li class="page-item">
+                    <a class="page-link" href="{{ url_for('main.index', page=tweets.next_num) }}">Next</a>
+                </li>
+                {% endif %}
+            </ul>
+        </nav>
+    </div>
+    <div class="col-md-4">
+        {% if current_user.is_authenticated %}
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">Welcome, {{ current_user.username }}!</h5>
+                <a href="{{ url_for('main.create_message') }}" class="btn btn-primary">Create New Tweet</a>
+            </div>
+        </div>
+        {% else %}
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">Welcome to Twitter Clone!</h5>
+                <p class="card-text">Please login to post tweets.</p>
+                <a href="{{ url_for('auth.login') }}" class="btn btn-primary">Login</a>
+                <a href="{{ url_for('auth.create_account') }}" class="btn btn-outline-primary">Register</a>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %} 

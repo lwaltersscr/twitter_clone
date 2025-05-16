@@ -1,0 +1,55 @@
+name: Test Twitter Clone
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Create env file
+      run: |
+        echo "FLASK_APP=project/__init__.py" > .env.dev
+        echo "FLASK_DEBUG=1" >> .env.dev
+        echo "DATABASE_URL=postgresql://twitter_user:twitter_password@db:5432/twitter_dev" >> .env.dev
+
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v1
+
+    - name: Build the containers
+      run: docker compose build
+
+    - name: Start containers
+      run: |
+        docker compose up -d
+        sleep 15  # Give more time for PostgreSQL to initialize
+
+    - name: Check running containers
+      run: docker compose ps
+
+    - name: Initialize database
+      run: |
+        docker compose exec -T web python manage.py create_db
+
+    - name: Generate test data
+      run: |
+        docker compose exec -T web python project/scripts/generate_prod_data.py \
+          "postgresql://twitter_user:twitter_password@db:5432/twitter_dev" 10 5
+
+    - name: Run tests
+      run: |
+        docker compose exec -T web python -m unittest project/tests/test_app.py -v
+
+    - name: Display logs on failure
+      if: failure()
+      run: docker compose logs
+
+    - name: Stop containers
+      if: always()
+      run: docker compose down 
